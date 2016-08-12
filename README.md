@@ -17,3 +17,8 @@ Ansible role for HAProxy 1.5 (CentOS7)
 
 # Manual
 Check defaults/main.yml, there are already defaults and examples.
+
+
+# Author Information
+
+This role was created in 2016 by sBlatt, based on [ansible-haproxy](https://galaxy.ansible.com/geerlingguy/haproxy/) by [Jeff Geerling](http://jeffgeerling.com/), author of [Ansible for DevOps](http://ansiblefordevops.com/).
