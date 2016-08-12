@@ -1,0 +1,63 @@
+---
+haproxy_cert_dir: /etc/haproxy/certs
+haproxy_socket: /var/lib/haproxy/stats
+haproxy_chroot: /var/lib/haproxy
+haproxy_user: haproxy
+haproxy_group: haproxy
+haproxy_cert_dir: /etc/haproxy/certs
+
+haproxy_frontend_mode: 'http'
+haproxy_cyphers: modern                                          #Choose modern, intermediate or old for Firefox recommended cyphers (https://mozilla.github.io/server-side-tls/ssl-config-generator/)
+haproxy_backend_balance_method: 'roundrobin'
+haproxy_backend_httpchk: 'HEAD / HTTP/1.1\r\nHost:localhost'
+haproxy_internal_ips: 192.168.0.0/16 10.0.0.0/8 172.16.0.0/12 127.0.0.0/8   #IPs that have access to backends defined as internal (you might want to add your external IP in case HAProxy is exposed)
+
+haproxy_ssl_crt: []                                              #Define all needed ssl certs FOR THIS SERVER as in vault file (or theoretically, defined as normal variable).
+                                                                 #If you do not provide a vault password when applying role, cert copy will be skipped (eg. if you only want to update config)
+#  - mysub.mydomain.tld                                          #These are the files that will be copied to the server
+
+### EXAMPLE for Vault File ###                                   #This is the Vault containing SSL Certs for different servers
+ssl_certs: []
+#  - name: mysub.mydomain.tld
+#    key: |
+#      -----BEGIN CERTIFICATE-----
+#      -----END CERTIFICATE-----
+### END EXAMPLE ###
+
+haproxy_frontends: []                                             #Define at least one frontend
+#- frontend_name: web-frontend
+#  bind:
+#    - ip: '*'
+#      port: '80'
+#    - ip: '*'
+#      port: '443'
+#      ssl_crt:                                                  #Define all needed ssl certs FOR THIS FRONTEND ONLY as in ssl_certs.name 
+#        - mysub.mydomain.tld                                    #These are the files that will be defined in the config, they must be included in haproxy_ssl_crt (or, theoretically, manually copied to the target servers...)
+#  backends:
+#    - acl_name: host_webfrontend_mysub                          #Fantasy name, not important
+#      acl_url: mysub.mydomain.tld                               #URL of webpage
+#      backend_name: backend-mysub                               #Backend name
+#    - acl_name: host_webfrontend_intranet
+#      acl_url: intranet.mydomain.tld
+#      backend_name: backend-intranet
+#      internal: True                                            #Only allow access from local ips defined as haproxy_internal_ips
+#  default_backend: backend-mysub                                #Optionally define a backend to be used for all non-matching requestsset_proxy_headers: True
+#  set_proxy_headers: True                                       #Adds Information about haproxy-server, frontendname, backendname and webservername to http-headers (nice for debugging, only viewable from ips marked as internal)
+
+haproxy_backends: []
+#- backend_name: backend-mysub                                   #Backend name defined in frontends.backends
+#  stats_uri: /haproxy_stats                                     #Optionally Display HAProxy-Stats for whole server on this backend
+#  servers:                                                      #Any number of webservers serving this backend
+#  - name: webmysub01
+#    ip: "10.1.8.1:80"
+#  - name: webmysub02
+#    ip: "10.1.8.2:80"
+#  add_headers:
+#  - "http-request set-header X-friendly-hello \"HELLO :)\""     #Add header information (optional)
+#- backend_name: backend-intranet
+#  servers:
+#    - name: webintranet01
+#      ip: "10.1.9.1:80"
+#    - name: webintranet02
+#      ip: "10.1.9.3:80"
+

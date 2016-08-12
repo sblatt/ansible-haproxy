@@ -1,0 +1,26 @@
+---
+- hosts: localhost
+  remote_user: root
+
+  vars:
+
+    haproxy_frontends:
+    - frontend_name: web-frontend
+      bind:
+      - ip: '*'
+        port: '80'
+      backends:
+      - acl_name: host_webfrontend_mysub                          #Fantasy name, not important
+        acl_url: mysub.mydomain.tld                               #URL of webpage
+        backend_name: backend-mysub                               #Backend name
+      set_proxy_headers: True                                       #Adds Information about haproxy-server, frontendname, backendname and webservername to http-headers (nice for debugging, only viewable from ips marked as internal)
+
+    haproxy_backends:
+    - backend_name: backend-mysub                                   #Backend name defined in frontends.backends
+      stats_uri: /haproxy_stats                                     #Optionally Display HAProxy-Stats for whole server on this backend
+      servers:                                                      #Any number of webservers serving this backend
+      - name: webmysub01
+        ip: "localhost:80"
+
+  roles:
+    - ansible-role-haproxy

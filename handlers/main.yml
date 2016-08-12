@@ -1,0 +1,15 @@
+---
+- name: restart haproxy
+  service: name=haproxy state=restarted
+  when: haproxy_checkconfig | succeeded
+
+- name: reload haproxy
+  service: name=haproxy state=reloaded
+  when: haproxy_checkconfig | succeeded
+
+- name: restart rsyslogd
+  service: name=rsyslog state=restarted
+
+- name: reload firewalld
+  shell: firewall-cmd --reload
+

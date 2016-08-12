@@ -1,0 +1,49 @@
+---
+- name: include the ansible vault containing our ssl certs
+  include_vars: /etc/ansible/vault/certificates.yml
+  ignore_errors: yes
+
+- name: Ensure HAProxy is installed (RedHat).
+  yum: name=haproxy state=installed
+
+- name: Copy HAProxy configuration in place.
+  template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    mode: 0644
+  notify: reload haproxy
+
+- name: Create cert dir
+  file: path={{haproxy_cert_dir}} state=directory mode=0500
+
+- name: Copy certificate files
+  copy: content="{{item.key}}" dest=/etc/haproxy/certs/{{item.name}}.pem mode=0400 owner=haproxy group=haproxy
+  when: item.name in haproxy_ssl_crt
+  with_items:
+    - "{{ssl_certs | default([])}}"
+  notify: restart haproxy
+
+- name: checking config
+  command: "haproxy -c -f /etc/haproxy/haproxy.cfg"
+  register: haproxy_checkconfig
+  failed_when: haproxy_checkconfig | failed
+  changed_when: False
+
+- name: Configure rsyslogd
+  lineinfile: "dest=/etc/rsyslog.conf state=present line='if $programname startswith \'haproxy\' then /var/log/haproxy.log' insertafter='#### RULES ####'"
+  notify:
+  - restart rsyslogd
+
+- name: open firewall webserver ports
+  firewalld: service={{ item }} permanent=true state=enabled
+  with_items:
+    - http
+    - https
+  notify:
+    - reload firewall
+
+- name: Ensure HAProxy is started and enabled on boot.
+  service: name=haproxy state=started enabled=yes
+  when: haproxy_checkconfig | succeeded
+
+
