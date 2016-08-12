@@ -1,70 +1,24 @@
-# Ansible Role: HAProxy
+# ansible-haproxy
+Ansible role for HAProxy 1.5 (CentOS7)
 
-[![Build Status](https://travis-ci.org/geerlingguy/ansible-role-haproxy.svg?branch=master)](https://travis-ci.org/geerlingguy/ansible-role-haproxy)
+# Features
+* Multiple Frontend and Backend support
+* Get SSL-Certs from Ansible Vault
+* Add predefined headers (HAProxy information, inly viewable from IPs marked as internal)
+* Add Custom Headers
+* Mark backends as internal (via ACL)
+* Check config, only start/restart if config check succeeded
+* Define stats uri
+* Add rsyslogd config to log to /var/log/haproxy.log
 
-Installs HAProxy on RedHat/CentOS and Debian/Ubuntu Linux servers.
+# Missing features
+* Logging configuration
+* aso
 
-**Note**: This role _officially_ supports HAProxy versions 1.4 or 1.5. Future versions may require some rework.
+# Manual
+Check defaults/main.yml, there are already defaults and examples.
 
-## Requirements
 
-None.
+# Author Information
 
-## Role Variables
-
-Available variables are listed below, along with default values (see `defaults/main.yml`):
-
-    haproxy_socket: /var/lib/haproxy/stats
-
-The socket through which HAProxy can communicate (for admin purposes or statistics). To disable/remove this directive, set `haproxy_socket: ''` (an empty string).
-
-    haproxy_chroot: /var/lib/haproxy
-
-The jail directory where chroot() will be performed before dropping privileges. To disable/remove this directive, set `haproxy_chroot: ''` (an empty string). Only change this if you know what you're doing!
-
-    haproxy_user: haproxy
-    haproxy_group: haproxy
-
-The user and group under which HAProxy should run. Only change this if you know what you're doing!
-
-    haproxy_frontend_name: 'hafrontend'
-    haproxy_frontend_bind_address: '*'
-    haproxy_frontend_port: 80
-    haproxy_frontend_mode: 'http'
-
-HAProxy frontend configuration directives.
-
-    haproxy_backend_name: 'habackend'
-    haproxy_backend_mode: 'http'
-    haproxy_backend_balance_method: 'roundrobin'
-    haproxy_backend_httpchk: 'HEAD / HTTP/1.1\r\nHost:localhost'
-
-HAProxy backend configuration directives.
-
-    haproxy_backend_servers:
-      - name: app1
-        address: 192.168.0.1:80
-      - name: app2
-        address: 192.168.0.2:80
-
-A list of backend servers (name and address) to which HAProxy will distribute requests.
-
-## Dependencies
-
-None.
-
-## Example Playbook
-
-    - hosts: balancer
-      sudo: yes
-      roles:
-        - { role: geerlingguy.haproxy }
-
-## License
-
-MIT / BSD
-
-## Author Information
-
-This role was created in 2015 by [Jeff Geerling](http://jeffgeerling.com/), author of [Ansible for DevOps](http://ansiblefordevops.com/).
-
+This role was created in 2016 by sBlatt, based on [ansible-haproxy](https://galaxy.ansible.com/geerlingguy/haproxy/) by [Jeff Geerling](http://jeffgeerling.com/), author of [Ansible for DevOps](http://ansiblefordevops.com/).
