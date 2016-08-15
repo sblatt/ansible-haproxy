@@ -64,7 +64,7 @@ frontend {{ frontend.frontend_name}}
 {% endfor %}
 
 {% for backend in frontend.backends %}
-  use_backend {{ backend.backend_name }} if {{ backend.acl_name }} {% if backend.internal is defined %}internal{% endif %}
+  use_backend {{ backend.backend_name }} if {{ backend.acl_name }} {% if backend.internal is defined %}{% if backend.internal  %}internal{% endif %}{% endif %}
 
 {% endfor %}
 {% if frontend.default_backend is defined %}
